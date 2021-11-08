@@ -1,0 +1,83 @@
+server:
+  port: 6073
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      enabled: true
+      force: true
+      charset: utf-8
+    context-path: /sinovac_order
+
+spring:
+  jpa:
+      database: mysql
+      show-sql: true
+      generate-ddl: true
+  datasource:
+#    url: jdbc:mysql://localhost:3306/sinovac_order?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://101.201.77.210:3306/sinovac_order_sap_test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
+    username: root
+    password: YwKj25o3
+    type: com.alibaba.druid.pool.DruidDataSource
+    #com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: druid
+        login-password: druid
+  redis:
+    database: 12
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: 123456
+    pool:
+      max-active: 20
+#第一次启动项目后，此时如果分别手动删除队列、绑定规则、交换器（模拟不存在），发送消息时，分别会走返回回调、返回回调、确认回调方法的异常逻辑。
+#再次重启项目后，发送消息时，MQ中丢失的队列、绑定规则、交换器，会自动创建，走确认回调方法的正常逻辑。
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    #虚拟host 可以不设置,使用server默认host(/)
+    virtual-host: /
+
+    publisher-confirm-type: correlated #过时：publisher-confirms: true 配置消息发送到交换器过程（channel error：交换器不存在），是否走确认回调机制
+    publisher-returns: true #配置消息从生产者发送到队列的整个过程（NO_ROUTE：路由键错误、交换器没有建立绑定规则、交换器未正常绑定队列（绑定规则错误，队列不存在）），是否走返回回调机制
+## pagehelper分页插件配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+  page-size-zero: false #当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+## Mapper4
+mapper:
+  mappers: com.send.demo.base.BaseMapper
+  not-empty: false
+  identity: MYSQL
+
+
+#Excel文件存储路径
+fdfs:
+  website: http://82.157.55.56/
+  #  website: http://dlwl.sinovac.com.cn:8888/
+  product-excel-url: http://file.scmsafe.com/group3/M00/13/2C/ZcloPF_pg4-AfpP1AAAjRxEenF498.xlsx
+  customer-excel-url: http://file.scmsafe.com/group3/M00/13/2D/ZcloPF_pg_uAGE5UAAAoNNmFKs861.xlsx
+  checkuser-excel-url: http://file.scmsafe.com/group3/M00/13/2D/ZcloPF_phGuABAC4AAAjpM2YOU870.xlsx
+  distribution-excel-url: http://file.scmsafe.com/group3/M00/3A/01/ZcloPGEA88OAZYYMAABh4qQPp7M020.zip
+verifyCode:
+  prefix: "protal:verifyCode"
+  overtime: 10 # 验证码超期时间3分钟
+
+# corpid: 企业微信唯一标志id，secret: 服务商身份的调用凭证，agentid：企业微信应用唯一标识
+wechat:
+  corpid: wx174836b22769cb12
+  secret: prFsO9_ZWatcQacN9QwMQeiM2UwPzh974yiwmDW0XvA
+  agentid: 1000013

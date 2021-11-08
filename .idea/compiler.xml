@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="rabbitmq-send" />
+        <module name="soringcloud-rabbitmq-demo" />
+        <module name="rabbitmq-receiver" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="rabbitmq-receiver" target="1.8" />
+      <module name="rabbitmq-send" target="1.8" />
+      <module name="soringcloud-rabbitmq-demo" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="rabbitmq-receiver" options="-parameters" />
+      <module name="rabbitmq-send" options="-parameters" />
+      <module name="soringcloud-rabbitmq-demo" options="-parameters" />
+    </option>
+  </component>
+</project>
