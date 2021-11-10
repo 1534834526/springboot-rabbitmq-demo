@@ -1,13 +1,19 @@
 package com.send.demo.config;
 
+import com.send.demo.common.RetryStruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author xjsh
@@ -16,6 +22,22 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class RabbitConfig {
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RetryStruct retryStruct;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @PostConstruct
+    public void init() {
+        //消息发送给队列过程中失败，是否开启将消息返回给生产者.
+        rabbitTemplate.setMandatory(true);
+        //不用匿名内部类的方式的处理
+        /*rabbitTemplate.setConfirmCallback(this);
+        rabbitTemplate.setReturnsCallback(this);*/
+    }
     public static final String DIRECT_EXCHANGE = "direct.exchange";
     public static final String TOPIC_EXCHANGE = "topic.exchange";
     public static final String FANOUT_EXCHANGE = "fanout.exchange";
@@ -38,27 +60,21 @@ public class RabbitConfig {
             @Override
             public void confirm(CorrelationData correlationData, boolean ack, String replyText) {
                 if(ack){
-                    log.info("消息发送到交换器成功！");
+                    String id = correlationData.getId();
+                    log.info("消息发送到交换器成功！消息ID:{}",id);
+                    if(StringUtils.hasText(id)){
+                        redisTemplate.delete(id);
+                    }
                 }else{
-                    log.info("消息发送到交换器失败原因:{}",replyText);
-                    //ConfirmCallback中是没有原message的，所以无法在这个函数中调用重发
-                    this.retryMessage(correlationData);
+                    log.info("消息发送到交换器失败！消息ID:{},失败原因:{}",correlationData.getId(),replyText);
+                    //ConfirmCallback中是没有原message消息的，所以无法在这个函数中调用重发，confirm只有一个通知的作用
                 }
-            }
-
-            private void retryMessage(CorrelationData correlationData) {
-                //判断重新发送是否不超过3次，不超过则重新发送（路由键，交换机，消息体）
-                String exchange = correlationData.getReturned().getExchange();
-                String routingKey = correlationData.getReturned().getRoutingKey();
-                String correlationId = correlationData.getReturned().getMessage().getMessageProperties().getCorrelationId();
             }
         });
 
-        //消息发送给队列过程中失败，是否将消息返回给生产者.
-        rabbitTemplate.setMandatory(true);
 
         //YML中配置走返回回调，这块才执行。
-        //版本原因：过时
+        //版本原因：已经过时
         /*rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
             @Override
             public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
