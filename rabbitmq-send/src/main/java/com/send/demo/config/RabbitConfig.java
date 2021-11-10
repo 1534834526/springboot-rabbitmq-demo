@@ -34,7 +34,7 @@ public class RabbitConfig {
     public void init() {
         //消息发送给队列过程中失败，是否开启将消息返回给生产者.
         rabbitTemplate.setMandatory(true);
-        //不用匿名内部类的方式的处理
+        //不用匿名内部类的方式的处理，配置类需实现ConfirmCallback，ReturnsCallback接口
         /*rabbitTemplate.setConfirmCallback(this);
         rabbitTemplate.setReturnsCallback(this);*/
     }
@@ -92,6 +92,8 @@ public class RabbitConfig {
                 String exchange = returnedMessage.getExchange();
                 String routingKey = returnedMessage.getRoutingKey();
                 log.info("消息:{},应答码:{},失败原因:{},交换器:{},路由键:{}",correlationId,replyCode,replyText,exchange,routingKey);
+                //进入该方法表示，没路由到具体的队列
+                //监听到消息，可以重新投递或者其它方案来提高消息的可靠性。,这里使用了定时任务替换
             }
         });
         return rabbitTemplate;

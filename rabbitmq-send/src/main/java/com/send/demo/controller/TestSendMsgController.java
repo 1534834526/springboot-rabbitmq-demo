@@ -6,10 +6,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1")
@@ -20,11 +21,7 @@ public class TestSendMsgController {
 
     @ApiOperation(value = "生产者发送消息")
     @PostMapping("/sendMsg")
-    public String sendMsg(){
-        HashMap<Object, Object> map = new HashMap<>();
-        map.put("id",1);
-        map.put("name","韩高明");
-        map.put("age",18);
+    public String sendMsg(@RequestBody Map map){
         //queueSender.sendSCM(JSON.toJSONString(map));
         queueSender.sendGkhtOrder(JSON.toJSONString(map));
         return "ok";
