@@ -37,7 +37,6 @@ import java.util.Map;
 @RabbitListener(queues = RabbitConfig.QUEUE_GKHT_ORDER,ackMode = "manual")
 @Slf4j
 public class QueueReceiver {
-    static int i = 0;
     @RabbitHandler
     public void process(String message, @Header(AmqpHeaders.DELIVERY_TAG)long deliveryTag, Channel channel,@Headers Map<String,Object> map) throws IOException {
         try {
@@ -52,7 +51,7 @@ public class QueueReceiver {
             //4、消费者消费失败，MQ需要将未确认状态的消息重新塞入队列，等待重新消费时，可以使用 basicNack方法，第三个参数true，否认消息，表示这个未确认状态的消息会重新进入队列（变成准备状态）
             log.info("消费失败!");
             channel.basicNack(deliveryTag, false, true);
-            //拒绝该消息，消息会被丢弃，不会重回队列
+            //拒绝该消息，消息会被丢弃，不会重回队列,如果配置了死信队列则进入死信队列
             //channel.basicReject(deliveryTag, false);
         }
 
