@@ -29,6 +29,10 @@ import java.util.Map;
 //开启手动确认manual的三种方式
 //spring.rabbitmq.listener.simple.acknowledge-mode=manual
 //factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+//ackMode=manual
+
+//1. 手动确认+公平分发消息时，如果未应答，将不再继续向该队列发送消息；
+//2. 手动确认+轮询（默认）分发消息时，如果未应答，不影响新消息的消费。
 @Component
 @RabbitListener(queues = RabbitConfig.QUEUE_GKHT_ORDER,ackMode = "manual")
 @Slf4j
@@ -40,7 +44,7 @@ public class QueueReceiver {
             //1、队列被监听到后，所有消息变成未确认状态
              log.info("正在消费:{},deliveryTag:{}",message,deliveryTag);
             //2、处理逻辑
-            //3、消费逻辑正常处理完毕后，下面这行代码是真正手动确认，删除未确认的消息（未确认的消息其实已经不在队列中了，只是等待确认后删除）
+            //3、消费逻辑正常处理完毕后，下面这行代码是真正确认应答，删除未确认的消息（未确认的消息其实已经不在队列中了，只是等待确认后删除）
             //第二个参数设置为false，表示删除未确认消息；true，表示需要将这条消息投递给其他的消费者重新消费
             channel.basicAck(deliveryTag, false);
             log.info("消费完成！");
