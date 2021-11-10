@@ -19,15 +19,18 @@ import java.util.Map;
  * @author xjsh
  */
 //queues = RabbitConfig.QUEUE_SCM
-@Component
-//开启手动确认manual的三种方式
+
 // ackMode：none、auto(默认)、manual
+
+//自动确认auto方式
+//默认方式：消费者消费此队列消息时，只要监听到第一条消息，所有消息变成未确认状态，而且就会回馈rabbitmq服务，rabbitmq服务会在消费完毕后清空队列消息。
+//即当监听第一条消息后，rabbitmq会认为此队列中的所有消息会全部被成功消费，所以当所有消息消费完毕后会移除未确认的所有消息，不管是否全部正常消费，所以可能会导致消息的丢失
+
+//开启手动确认manual的三种方式
 //spring.rabbitmq.listener.simple.acknowledge-mode=manual
 //factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-
-//注意，自动确认auto：消费者消费此队列消息时，只要监听到第一条消息，所有消息变成未确认状态，而且就会回馈rabbitmq服务，rabbitmq服务会在消费完毕后清空队列消息。
-//即当监听第一条消息后，rabbitmq会认为此队列中的所有消息会全部被成功消费，所以当所有消息消费完毕后会移除未确认的所有消息，不管是否全部正常消费，所以可能会导致消息的丢失
-@RabbitListener(queues = RabbitConfig.QUEUE_GKHT_ORDER,ackMode = "AUTO")
+@Component
+@RabbitListener(queues = RabbitConfig.QUEUE_GKHT_ORDER,ackMode = "manual")
 @Slf4j
 public class QueueReceiver {
     static int i = 0;
