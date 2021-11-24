@@ -17,7 +17,7 @@ spring:
       generate-ddl: true
   datasource:
 #    url: jdbc:mysql://localhost:3306/sinovac_order?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
-    url: jdbc:mysql://101.201.77.210:3306/sinovac_order_sap_test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://101.201.77.210:3306/sinovac_order_sap_test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&jdbcCompliantTruncation=false
     username: root
     password: YwKj25o3
     type: com.alibaba.druid.pool.DruidDataSource

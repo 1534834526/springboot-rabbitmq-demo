@@ -4,8 +4,8 @@ import com.send.demo.common.RetryStruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.support.CorrelationData;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -75,15 +75,17 @@ public class RabbitConfig {
 
         //YML中配置走返回回调，这块才执行。
         //版本原因：已经过时
-        /*rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+        rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
             @Override
             public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
-                String correlationId = message.getMessageProperties().getCorrelationId();
+                String correlationId = new String(message.getMessageProperties().getCorrelationId());
                 log.info("消息:{},应答码:{},失败原因:{},交换器:{},路由键:{}",correlationId,replyCode,replyText,exchange,routingKey);
+                //进入该方法表示，没路由到具体的队列
+                //监听到消息，可以重新投递或者其它方案来提高消息的可靠性。,这里使用了定时任务替换
             }
-        });*/
+        });
         //替换为这个（做了封装）
-        rabbitTemplate.setReturnsCallback(new RabbitTemplate.ReturnsCallback() {
+        /*rabbitTemplate.setReturnsCallback(new RabbitTemplate.ReturnsCallback() {
             @Override
             public void returnedMessage(ReturnedMessage returnedMessage) {
                 String correlationId = returnedMessage.getMessage().getMessageProperties().getCorrelationId();
@@ -95,7 +97,7 @@ public class RabbitConfig {
                 //进入该方法表示，没路由到具体的队列
                 //监听到消息，可以重新投递或者其它方案来提高消息的可靠性。,这里使用了定时任务替换
             }
-        });
+        });*/
         return rabbitTemplate;
     }
 

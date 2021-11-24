@@ -34,9 +34,9 @@ import java.util.Map;
 //1. 手动确认+公平分发消息时，如果未应答，将不再继续向该队列发送消息；
 //2. 手动确认+轮询（默认）分发消息时，如果未应答，不影响新消息的消费。
 @Component
-@RabbitListener(queues = RabbitConfig.QUEUE_GKHT_ORDER,ackMode = "manual")
+@RabbitListener(queues = RabbitConfig.QUEUE_GKHT_ORDER)
 @Slf4j
-public class QueueReceiver {
+class QueueReceiver {
     @RabbitHandler
     public void process(String message, @Header(AmqpHeaders.DELIVERY_TAG)long deliveryTag, Channel channel,@Headers Map<String,Object> map) throws IOException {
         try {
